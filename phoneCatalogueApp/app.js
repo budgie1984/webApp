@@ -21,14 +21,63 @@
     		})
  		.when('/home', {
       		templateUrl: 'partials/home.html',
-      		controller: 'PhoneListCtrl'
+      		controller: 'HomeCtrl'
     		})
           .otherwise({
             redirectTo: '/phones'
           });
       }]);
 
-    phonesApp.controller('PhoneListCtrl', 
+ 
+     phonesApp.factory('PhoneService', ['$http' , function($http){
+            var api = {
+                getPhones : function() {
+                    return $http.get('phones/phones.json')            
+                }, 
+                getPhone : function(id) {  // NEW
+                     return $http.get('phones/' + id + '.json')
+                }
+            }
+            return api
+        }])
+
+phonesApp.service('UserService',  function($rootScope){
+  var users = [{ 
+    firstname :     'brian',
+    lastname :      'burroughs',
+    username :      'boggyb',
+    emailaddress :  'budgie1984@gmail.com',
+    password :      'admin',
+  }] || [];
+
+ var currentUser = null;
+
+  this.getUsers = function () {
+    return users;
+  };
+
+  this.getCurrentUser = function () {
+    return currentUser;
+  };
+
+  this.register = function(userInfo) {
+    var user = new User(userInfo);
+    users.push(user);
+  };
+
+  this.logIn = function(username,password){  
+   users.forEach(function(user){
+   if(user.username == username && user.password == password){
+    debugger
+      currentUser = user;
+   };
+   });
+  };//end function
+
+})
+
+
+   phonesApp.controller('PhoneListCtrl', 
         ['$scope', 'PhoneService',
           function($scope, PhoneService) {
              PhoneService.getPhones().success(function(data) {
@@ -36,6 +85,22 @@
                  })
              $scope.orderProp = 'age';
           }])
+
+///undefined UserService - try to replicate where we have two services called elsewhere
+     phonesApp.controller('HomeCtrl', 
+       // ['$scope', 'PhoneService', 'UserService',
+          function($scope, PhoneService, $rootScope, UserService) {
+
+             // PhoneService.getPhones().success(function(data) {
+             //       $scope.phones = data
+             //     });
+
+             // $scope.orderProp = 'age';
+             debugger
+             $scope.currentUser = UserService.getCurrentUser()
+          }
+          //]
+          );
 
    phonesApp.controller('PhoneDetailCtrl', 
          ['$scope', '$location', '$routeParams', 'PhoneService', 
@@ -52,78 +117,25 @@
                   $scope.img = img
                }
       }])
-		  
-     phonesApp.factory('PhoneService', ['$http' , function($http){
-            var api = {
-                getPhones : function() {
-                    return $http.get('phones/phones.json')            
-                }, 
-                getPhone : function(id) {  // NEW
-                     return $http.get('phones/' + id + '.json')
-                }
-            }
-            return api
-        }])
-
-phonesApp.service('UserService', ['$http' , function ($http){
-  var users = [{ 
-    firstname :     'brian',
-    lastname :      'burroughs',
-    username :      'boggyb',
-    emailaddress :  'budgie1984@gmail.com',
-    password :      'admin',
-  }];
-
- var currentUser = null;
-
-  this.getUsers = function () {
-    return users;
-     
-  };
-
-  this.getCurrentUser = function () {
-    return currentUser;
-  };
-
-  this.register = function(userInfo) {
-    var user = new User(userInfo);
-    users.push(user);
-  };
-
-  this.login = function(username,password){  
-   users.forEach(function(user){
-   if(user.username == username && user.password == password){
-     currentUser = user;
-   };
-   });
-  };//end function
-
-}]);
-
+      
 
 phonesApp.controller('RegisterCtrl', 
-  function ($scope, $location, UserService) {
+  function ($scope, $location, UserService, $rootScope) {
    $scope.register = function(){
     UserService.register($scope.user);
-    $location.path('/login');
-  }
+    $location.path('/login'); 	
+	//PhoneService.getPhones()
+}
 });
-
 
 phonesApp.controller('LoginCtrl', 
   function ($scope, $location, UserService) {
-
+  $scope.logIn = {};
    $scope.logIn = function(){
-     UserService.login($scope.user.username,$scope.user.password);
-     $location.path('/home');
-  }
-});
-
-phonesApp.controller('HomeCtrl', 
-  function ($scope, $location, UserService, PhoneService) {
-   $scope.currentUser = UserService.getCurrentUser();
-	PhoneService.getPhones()
-
+   	debugger
+   	UserService.logIn($scope.logIn.username, $scope.logIn.password)
+   	$location.path('/home'); 	
+}
 });
 
 
