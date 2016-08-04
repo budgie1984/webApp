@@ -1,0 +1,26 @@
+
+<div >
+
+  <div class="container">
+    <h1 class="well">Register for Mobile Mania</h1>
+    <div class="col-sm-12 well">
+      <div class="row">
+       
+	<form name="register" ng-submit="register()">
+        <label>First Name </label>
+        <input type="text"class="form-control"placeholder="First Name" ng-model="user.firstname" >
+        <label>Last Name </label>
+        <input type="text" class="form-control"placeholder="Last Name" ng-model="user.lastname" >
+        <label>User Name </label>
+        <input type="text" class="form-control"placeholder="User Name" ng-model="user.username" >
+        <label>Email </label>
+        <input  type="text" class="form-control"placeholder="Email" ng-model="user.emailaddress" >
+        <label>Password</label>
+        <input type="password" class="form-control"placeholder="Password" ng-model="user.password" >
+        <br>
+        <button type="button" class="btn btn-info" ng-click="register()">Register Now</button>
+        </form>
+
+        </div>
+      </div>
+    </div>
