@@ -87,20 +87,32 @@ phonesApp.service('UserService',  function($rootScope){
           }])
 
 ///undefined UserService - try to replicate where we have two services called elsewhere
-     phonesApp.controller('HomeCtrl', 
+   //  phonesApp.controller('HomeCtrl', 
        // ['$scope', 'PhoneService', 'UserService',
-          function($scope, PhoneService, $rootScope, UserService) {
+       //   function($scope, PhoneService, $rootScope, UserService) {
 
              // PhoneService.getPhones().success(function(data) {
              //       $scope.phones = data
              //     });
 
              // $scope.orderProp = 'age';
-             debugger
-             $scope.currentUser = UserService.getCurrentUser()
-          }
+
+        //     $scope.currentUser = UserService.getCurrentUser()
+        //  }
           //]
-          );
+       //   );
+
+  
+   phonesApp.controller('HomeCtrl', 
+        ['$scope', 'PhoneService','UserService',
+          function($scope, PhoneService, UserService) {
+             PhoneService.getPhones().success(function(data) {
+                   $scope.phones = data
+                   $scope.currentUser = UserService.getCurrentUser()
+                 })
+             $scope.orderProp = 'age';
+          }])
+
 
    phonesApp.controller('PhoneDetailCtrl', 
          ['$scope', '$location', '$routeParams', 'PhoneService', 
@@ -116,7 +128,7 @@ phonesApp.service('UserService',  function($rootScope){
              $scope.setImage = function(img) {
                   $scope.img = img
                }
-      }])
+      }]);
       
 
 phonesApp.controller('RegisterCtrl', 
@@ -132,7 +144,6 @@ phonesApp.controller('LoginCtrl',
   function ($scope, $location, UserService) {
   $scope.logIn = {};
    $scope.logIn = function(){
-   	debugger
    	UserService.logIn($scope.logIn.username, $scope.logIn.password)
    	$location.path('/home'); 	
 }
