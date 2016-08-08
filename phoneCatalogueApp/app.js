@@ -68,11 +68,10 @@ phonesApp.service('UserService',  function($rootScope){
   this.logIn = function(username,password){  
    users.forEach(function(user){
    if(user.username == username && user.password == password){
-    debugger
       currentUser = user;
    };
    });
-  };//end function
+  };
 
 })
 
@@ -86,31 +85,30 @@ phonesApp.service('UserService',  function($rootScope){
              $scope.orderProp = 'age';
           }])
 
-///undefined UserService - try to replicate where we have two services called elsewhere
-   //  phonesApp.controller('HomeCtrl', 
-       // ['$scope', 'PhoneService', 'UserService',
-       //   function($scope, PhoneService, $rootScope, UserService) {
-
-             // PhoneService.getPhones().success(function(data) {
-             //       $scope.phones = data
-             //     });
-
-             // $scope.orderProp = 'age';
-
-        //     $scope.currentUser = UserService.getCurrentUser()
-        //  }
-          //]
-       //   );
-
-  
    phonesApp.controller('HomeCtrl', 
         ['$scope', 'PhoneService','UserService',
           function($scope, PhoneService, UserService) {
+            var phones =[]
              PhoneService.getPhones().success(function(data) {
                    $scope.phones = data
+                   data.forEach(function(data){
+                      var phone =  new Phone(data)
+                      phones.push(phone);
+                   })
                    $scope.currentUser = UserService.getCurrentUser()
+
+             $scope.addToCart = function($event){
+              phones.forEach(function(phone){
+                var id = $event.target.id
+                if (phone.id == id ){
+                  $scope.currentUser.addToCart(phone)
+                }
+              })
+
+             }
                  })
              $scope.orderProp = 'age';
+
           }])
 
 
@@ -136,7 +134,6 @@ phonesApp.controller('RegisterCtrl',
    $scope.register = function(){
     UserService.register($scope.user);
     $location.path('/login'); 	
-	//PhoneService.getPhones()
 }
 });
 
@@ -156,33 +153,16 @@ var User = function(userInfo){
   this.username = userInfo.username;
   this.emailaddress = userInfo.emailaddress;
   this.password = userInfo.password;
+  this.cartTotal = 0;
+  this.phoneCart = []
+
+  this.addToCart = function(phone){
+    this.cartTotal = this.cartTotal + phone.price;
+    this.phoneCart.push(phone)
+  }
 };
 
-
-
-phonesApp.service('ReviewService', ['$http' , function ($http){
-  // var reviews = [{ 
-  //  	 stars :     '1',
-  //    review:     'excellent',
-  //  	 email :     'boggyb',
-
-  // }];
-
-
-  this.getReviews = function () {
-    return reviews;
-     
-  };
-
-}]);
-
-
-
-
-
-phonesApp.controller("ReviewController", function($scope, ReviewService){
-this.review = {};
-this.addReview = function(product) {
-phones.reviews.push(this.review);
-};
-});
+var Phone = function(phoneData){
+  this.price = phoneData.price || 200;
+  this.id = phoneData.id;
+}
